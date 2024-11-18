@@ -19,7 +19,10 @@ const API_BASE_URL = "http://5.253.247.243:8000";
 
 export default function Home() {
   const [prompts, setPrompts] = useState<
-    { id: number; content: string; description: string }[]
+    { id: number; content: string; description: string; tags: number[] }[]
+  >([]);
+  const [allPrompts, setAllPrompts] = useState<
+    { id: number; content: string; description: string; tags: number[] }[]
   >([]);
   const [tags, setTags] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -28,11 +31,13 @@ export default function Home() {
     content: "",
     description: "",
   });
+  const [selectedTag, setSelectedTag] = useState<number | null>(null);
 
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/prompt_fragments`);
       setPrompts(response.data);
+      setAllPrompts(response.data);
     } catch {
       setError("Er is een probleem met het ophalen van de prompts.");
     }
@@ -55,6 +60,7 @@ export default function Home() {
         author_id: 1,
       });
       setPrompts([...prompts, response.data]);
+      setAllPrompts([...allPrompts, response.data]);
       setNewPrompt({ content: "", description: "" });
       onClose();
     } catch {
@@ -66,9 +72,21 @@ export default function Home() {
     try {
       await axios.delete(`${API_BASE_URL}/prompt_fragments/${id}`);
       setPrompts(prompts.filter((prompt) => prompt.id !== id));
+      setAllPrompts(allPrompts.filter((prompt) => prompt.id !== id));
     } catch {
       setError("Er is een probleem met het verwijderen van de prompt.");
     }
+  };
+
+  const filterPromptsByTag = (tagId: number) => {
+    setSelectedTag(tagId);
+    const filteredPrompts = allPrompts.filter((prompt) => prompt.tags.includes(tagId));
+    setPrompts(filteredPrompts);
+  };
+
+  const resetFilter = () => {
+    setSelectedTag(null);
+    setPrompts(allPrompts);
   };
 
   useEffect(() => {
@@ -114,31 +132,32 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Beschikbare ChatGPT Prompts
             </h2>
-              <Button color="primary" onPress={onOpen}>
-                Voeg nieuwe prompt toe
-              </Button>
+            <Button color="primary" onPress={onOpen}>
+              Voeg nieuwe prompt toe
+            </Button>
           </motion.div>
 
-          <section className="mb-6 flex">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 mr-6">
+          <section className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Tags
             </h2>
-            <motion.div
-              className="flex flex-wrap gap-4"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            >
+            <div className="flex flex-wrap gap-4">
               {tags.map((tag) => (
-                <motion.div
+                <button
                   key={tag.id}
-                  className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
-                  whileHover={{ scale: 1.1 }}
+                  onClick={() => filterPromptsByTag(tag.id)}
+                  className='bg-primary text-white px-4 py-2 rounded-md'
                 >
                   {tag.name}
-                </motion.div>
+                </button>
               ))}
-            </motion.div>
+              <button
+                onClick={resetFilter}
+                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md"
+              >
+                Toon Alle
+              </button>
+            </div>
           </section>
 
           <motion.div
