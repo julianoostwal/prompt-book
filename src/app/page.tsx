@@ -77,41 +77,68 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <motion.main
+      className="min-h-screen bg-gray-100 p-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
+        <motion.h1
+          className="text-3xl font-bold text-center text-blue-600 mb-6"
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           De Fietsende Kip Premium ChatGPT Prompts
-        </h1>
+        </motion.h1>
 
         {error && (
-          <div className="bg-red-500 text-white p-4 rounded-md mb-6">
+          <motion.div
+            className="bg-red-500 text-white p-4 rounded-md mb-6"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
             <p>{error}</p>
-          </div>
+          </motion.div>
         )}
 
         <section className="mb-6">
-          <div className="flex justify-between flex-wrap gap-4">
+          <motion.div
+            className="flex justify-between flex-wrap gap-4"
+            initial={{ x: -100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Beschikbare ChatGPT Prompts
             </h2>
-            <Button color="primary" onPress={onOpen}>
-              Voeg nieuwe prompt toe
-            </Button>
-          </div>
-
+              <Button color="primary" onPress={onOpen}>
+                Voeg nieuwe prompt toe
+              </Button>
+          </motion.div>
 
           <section className="mb-6 flex">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4 mr-6">Tags</h2>
-            <div className="flex flex-wrap gap-4">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4 mr-6">
+              Tags
+            </h2>
+            <motion.div
+              className="flex flex-wrap gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            >
               {tags.map((tag) => (
-                <div
+                <motion.div
                   key={tag.id}
                   className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
+                  whileHover={{ scale: 1.1 }}
                 >
                   {tag.name}
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
 
           <motion.div
@@ -127,19 +154,21 @@ export default function Home() {
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-              <div>
-                <h3 className="text-xl font-semibold text-blue-500">{prompt.description}</h3>
-                <p className="text-gray-700 mt-2">{prompt.content}</p>
-              </div>
-              <Button
-                size="sm"
-                color="danger"
-                className="mt-4"
-                onPress={() => handleDeletePrompt(prompt.id)}
-              >
-                Verwijderen
-              </Button>
-            </motion.div>            
+                <div>
+                  <h3 className="text-xl font-semibold text-blue-500">
+                    {prompt.description}
+                  </h3>
+                  <p className="text-gray-700 mt-2">{prompt.content}</p>
+                </div>
+                <Button
+                  size="sm"
+                  color="danger"
+                  className="mt-4"
+                  onPress={() => handleDeletePrompt(prompt.id)}
+                >
+                  Verwijderen
+                </Button>
+              </motion.div>
             ))}
           </motion.div>
         </section>
@@ -183,6 +212,6 @@ export default function Home() {
           </ModalContent>
         </Modal>
       </div>
-    </main>
+    </motion.main>
   );
 }
