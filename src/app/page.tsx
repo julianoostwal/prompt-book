@@ -136,12 +136,12 @@ export default function Home() {
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Tags</h2>
           <div className="flex flex-wrap gap-4">
             {tags.map((tag) => (
-              <div
+              <button
                 key={tag.id}
                 className="bg-blue-100 text-blue-600 px-4 py-2 rounded-md"
               >
                 {tag.name}
-              </div>
+              </button>
             ))}
           </div>
         </section>
