@@ -1,0 +1,16 @@
+{
+    "name": "tiesnoordhuis/deepdive_api",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "DeepDiveAPI\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ties Noordhuis",
+            "email": "ties@bit-academy.nl"
+        }
+    ],
+    "require": {}
+}

@@ -1,0 +1,854 @@
+openapi: 3.0.3
+info:
+  title: PromptBook API
+  description: API for managing authors, prompt fragments, composite prompts, tags, context files, and result examples for a prompt book application.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/
+
+paths:
+  /authors:
+    get:
+      summary: List all authors
+      responses:
+        '200':
+          description: List of authors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Author'
+    post:
+      summary: Create a new author
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        '201':
+          description: Author created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+
+  /authors/{id}:
+    get:
+      summary: Get a specific author
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Author ID
+      responses:
+        '200':
+          description: Author details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: Author not found
+    put:
+      summary: Update an existing author
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Author ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Author'
+      responses:
+        '200':
+          description: Author updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Author'
+        '404':
+          description: Author not found
+    delete:
+      summary: Delete an author
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Author ID
+      responses:
+        '204':
+          description: Author deleted
+        '404':
+          description: Author not found
+
+  /prompt_fragments:
+    get:
+      summary: List all prompt fragments
+      responses:
+        '200':
+          description: List of prompt fragments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PromptFragment'
+    post:
+      summary: Create a new prompt fragment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromptFragment'
+      responses:
+        '201':
+          description: Prompt fragment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptFragment'
+
+  /prompt_fragments/{id}:
+    get:
+      summary: Get a specific prompt fragment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+      responses:
+        '200':
+          description: Prompt fragment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptFragment'
+        '404':
+          description: Prompt fragment not found
+    put:
+      summary: Update an existing prompt fragment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PromptFragment'
+      responses:
+        '200':
+          description: Prompt fragment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptFragment'
+        '404':
+          description: Prompt fragment not found
+    delete:
+      summary: Delete a specific prompt fragment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+      responses:
+        '204':
+          description: Prompt fragment deleted
+        '404':
+          description: Prompt fragment not found
+
+  /prompt_fragments/{id}/with_tags:
+    get:
+      summary: Get a specific prompt fragment with associated tags
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+      responses:
+        '200':
+          description: Prompt fragment with associated tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PromptFragmentWithTags'
+        '404':
+          description: Prompt fragment not found
+  /prompt_fragments/{id}/tags/{tag_id}:
+    post:
+      summary: Link a tag to a prompt fragment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+        - in: path
+          name: tag_id
+          schema:
+            type: integer
+          required: true
+          description: Tag ID
+      responses:
+        '201':
+          description: Tag linked to prompt fragment
+    delete:
+      summary: Unlink a tag from a prompt fragment
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+        - in: path
+          name: tag_id
+          schema:
+            type: integer
+          required: true
+          description: Tag ID
+      responses:
+        '204':
+          description: Tag unlinked from prompt fragment
+        '404':
+          description: Tag or prompt fragment not found
+
+  /tags:
+    get:
+      summary: List all tags
+      responses:
+        '200':
+          description: List of tags
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+    post:
+      summary: Create a new tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+      responses:
+        '201':
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+  /tags/{id}:
+    get:
+      summary: Get a specific tag
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Tag ID
+      responses:
+        '200':
+          description: Tag details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '404':
+          description: Tag not found
+    put:
+      summary: Update an existing tag
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Tag ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+      responses:
+        '200':
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '404':
+          description: Tag not found
+    delete:
+      summary: Delete a specific tag
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Tag ID
+      responses:
+        '204':
+          description: Tag deleted
+        '404':
+          description: Tag not found
+
+  /composite_prompts:
+    get:
+      summary: List all composite prompts
+      responses:
+        '200':
+          description: List of composite prompts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompositePrompt'
+    post:
+      summary: Create a new composite prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompositePrompt'
+      responses:
+        '201':
+          description: Composite prompt created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositePrompt'
+
+  /composite_prompts/{id}:
+    get:
+      summary: Get a specific composite prompt
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+      responses:
+        '200':
+          description: Composite prompt details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositePrompt'
+        '404':
+          description: Composite prompt not found
+    put:
+      summary: Update an existing composite prompt
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompositePrompt'
+      responses:
+        '200':
+          description: Composite prompt updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositePrompt'
+        '404':
+          description: Composite prompt not found
+    delete:
+      summary: Delete a composite prompt
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+      responses:
+        '204':
+          description: Composite prompt deleted
+        '404':
+          description: Composite prompt not found
+
+  /composite_prompts/{id}/expanded:
+    get:
+      summary: Get a specific composite prompt along with its fragments
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+      responses:
+        '200':
+          description: Composite prompt with its fragments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompositePromptExpanded'
+        '404':
+          description: Composite prompt not found
+  
+  /composite_prompts/{id}/fragments/{fragment_id}:
+    post:
+      summary: Link a prompt fragment to a composite prompt
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+        - in: path
+          name: fragment_id
+          schema:
+            type: integer
+          required: true
+          description: Fragment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_index:
+                  type: integer
+                  description: Position of the fragment in the composite prompt
+      responses:
+        '201':
+          description: Fragment linked to composite prompt
+    delete:
+      summary: Unlink a prompt fragment from a composite prompt
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+        - in: path
+          name: fragment_id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+      responses:
+        '204':
+          description: Fragment unlinked from composite prompt
+        '404':
+          description: Fragment or composite prompt not found
+    put:
+      summary: Update the order of a prompt fragment in a composite prompt
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Composite prompt ID
+        - in: path
+          name: fragment_id
+          schema:
+            type: integer
+          required: true
+          description: Prompt fragment ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                order_index:
+                  type: integer
+                  description: New position of the fragment in the composite prompt
+      responses:
+        '200':
+          description: Fragment order updated
+        '404':
+          description: Fragment or composite prompt not found
+
+  /result_examples:
+    get:
+      summary: List all result examples
+      responses:
+        '200':
+          description: List of result examples
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResultExample'
+    post:
+      summary: Create a new result example
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResultExample'
+      responses:
+        '201':
+          description: Result example created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultExample'
+
+  /result_examples/{id}:
+    get:
+      summary: Get a specific result example
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Result example ID
+      responses:
+        '200':
+          description: Result example details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultExample'
+        '404':
+          description: Result example not found
+    put:
+      summary: Update an existing result example
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Result example ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResultExample'
+      responses:
+        '200':
+          description: Result example updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResultExample'
+        '404':
+          description: Result example not found
+    delete:
+      summary: Delete a result example
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Result example ID
+      responses:
+        '204':
+          description: Result example deleted
+        '404':
+          description: Result example not found
+
+  /context_files:
+    get:
+      summary: List all context files
+      responses:
+        '200':
+          description: List of context files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContextFile'
+    post:
+      summary: Create a new context file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContextFile'
+      responses:
+        '201':
+          description: Context file created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextFile'
+
+  /context_files/{id}:
+    get:
+      summary: Get a specific context file
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Context file ID
+      responses:
+        '200':
+          description: Context file details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextFile'
+        '404':
+          description: Context file not found
+    put:
+      summary: Update an existing context file
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Context file ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContextFile'
+      responses:
+        '200':
+          description: Context file updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContextFile'
+        '404':
+          description: Context file not found
+    delete:
+      summary: Delete a context file
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: Context file ID
+      responses:
+        '204':
+          description: Context file deleted
+        '404':
+          description: Context file not found
+
+components:
+  schemas:
+    Author:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+
+    PromptFragment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          description: ID of the author who created the fragment
+        content:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    PromptFragmentWithTags:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          description: ID of the author who created the fragment
+        content:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+          description: List of tags associated with the prompt fragment
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+
+    CompositePrompt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          description: ID of the author who created the composite prompt
+        title:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    CompositePromptExpanded:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author_id:
+          type: integer
+          description: ID of the author who created the composite prompt
+        title:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        fragments:
+          type: array
+          items:
+            type: object
+            properties:
+              order_index:
+                type: integer
+                description: The order index of this fragment in the composite prompt
+              promptFragment:
+                $ref: '#/components/schemas/PromptFragment'
+          description: List of prompt fragments that make up the composite prompt, along with their order index
+        result_examples:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultExample'
+          description: List of result examples that demonstrate possible outputs for the composite prompt
+        context_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContextFile'
+          description: List of context files that provide additional context for the composite prompt
+
+    ResultExample:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        composite_prompt_id:
+          type: integer
+          description: ID of the associated composite prompt
+        result_content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    ContextFile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        composite_prompt_id:
+          type: integer
+          description: ID of the associated composite prompt
+        filename:
+          type: string
+        file_path:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
