@@ -44,8 +44,8 @@ class PromptFragmentResource extends Resource {
     public function put($id) {
         $data = $this->getJsonData();
 
-        if (empty($data['author_id']) || empty($data['content'])) {
-            throw new \Exception("Author ID and content are required", 400);
+        if (empty($data['author_id']) && empty($data['content'])) {
+            throw new \Exception("Author ID or content is required", 400);
         }
 
         return [
