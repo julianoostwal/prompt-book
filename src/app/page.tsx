@@ -1,6 +1,5 @@
 "use client";
-
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -12,7 +11,6 @@ import {
   Input,
   Textarea,
   useDisclosure,
-  Link,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
 
@@ -33,21 +31,14 @@ export default function Home() {
     description: "",
   });
   const [selectedTag, setSelectedTag] = useState<number | null>(null);
+  const [editingPromptId, setEditingPromptId] = useState<number | null>(null);
+  const [editingContent, setEditingContent] = useState("");
 
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/prompt_fragments`);
       setPrompts(response.data);
       setAllPrompts(response.data);
-      response.data.forEach((prompt: any) => {
-        setTimeout(() => {
-          const textarea = document.getElementById(`prompt-textarea-${prompt.id}`) as HTMLTextAreaElement;
-          if (textarea) {
-            textarea.style.height = "auto";
-            textarea.style.height = `${textarea.scrollHeight}px`;
-          }
-        }, 0);
-      });
     } catch {
       setError("Er is een probleem met het ophalen van de prompts.");
     }
@@ -73,19 +64,12 @@ export default function Home() {
       setAllPrompts([...allPrompts, response.data]);
       setNewPrompt({ content: "", description: "" });
       onClose();
-      setTimeout(() => {
-        const textarea = document.getElementById(`prompt-textarea-${response.data.id}`) as HTMLTextAreaElement;
-        if (textarea) {
-          textarea.style.height = "auto";
-          textarea.style.height = `${textarea.scrollHeight}px`;
-        }
-      }, 0);
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
   };
 
-  const handleDeletePrompt = async (id: number) => {
+  const handleDeletePrompt = async (id) => {
     try {
       await axios.delete(`${API_BASE_URL}/prompt_fragments/${id}`);
       setPrompts(prompts.filter((prompt) => prompt.id !== id));
@@ -95,16 +79,21 @@ export default function Home() {
     }
   };
 
-  const handleEditPrompt = (id: number, newContent: string) => {
-    setPrompts(
-      prompts.map((prompt) =>
-        prompt.id === id ? { ...prompt, content: newContent } : prompt
-      )
-    );
+  const handleEditPrompt = async (id) => {
+    try {
+      setPrompts(
+        prompts.map((prompt) =>
+          prompt.id === id ? { ...prompt, content: editingContent } : prompt
+        )
+      );
+      setEditingPromptId(null);
+      setEditingContent("");
+    } catch {
+      setError("Er is een probleem met het bewerken van de prompt.");
+    }
   };
 
-
-  const filterPromptsByTag = (tagId: number) => {
+  const filterPromptsByTag = (tagId) => {
     setSelectedTag(tagId);
     const filteredPrompts = allPrompts.filter((prompt) =>
       prompt.tags.includes(tagId)
@@ -122,11 +111,6 @@ export default function Home() {
     fetchTags();
   }, []);
 
-  const autoResizeTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    e.target.style.height = "auto";
-    e.target.style.height = `${e.target.scrollHeight}px`;
-  };
-
   return (
     <motion.main
       className="min-h-screen bg-gray-100 p-8"
@@ -143,7 +127,6 @@ export default function Home() {
         >
           De Fietsende Kip Premium ChatGPT Prompts
         </motion.h1>
-
         {error && (
           <motion.div
             className="bg-red-500 text-white p-4 rounded-md mb-6"
@@ -154,7 +137,6 @@ export default function Home() {
             <p>{error}</p>
           </motion.div>
         )}
-
         <section className="mb-6">
           <motion.div
             className="flex justify-between flex-wrap gap-4"
@@ -169,28 +151,6 @@ export default function Home() {
               Voeg nieuwe prompt toe
             </Button>
           </motion.div>
-
-          <section className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Tags</h2>
-            <div className="flex flex-wrap gap-4">
-              {tags.map((tag) => (
-                <button
-                  key={tag.id}
-                  onClick={() => filterPromptsByTag(tag.id)}
-                  className="bg-primary text-white px-4 py-2 rounded-md"
-                >
-                  {tag.name}
-                </button>
-              ))}
-              <button
-                onClick={resetFilter}
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md"
-              >
-                Toon Alle
-              </button>
-            </div>
-          </section>
-
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
             initial={{ opacity: 0 }}
@@ -208,28 +168,35 @@ export default function Home() {
                   <h3 className="text-xl font-semibold text-blue-500">
                     {prompt.description}
                   </h3>
-                  <textarea
-                    id={`prompt-textarea-${prompt.id}`}
-                    className="text-gray-700 mt-2 w-full resize-none overflow-hidden"
-                    rows={1}
-                    value={prompt.content}
-                    onChange={(e) => {
-                      autoResizeTextarea(e);
-                      handleEditPrompt(prompt.id, e.target.value);
-                    }}
-                  />
+                  {editingPromptId === prompt.id ? (
+                    <Textarea
+                      value={editingContent}
+                      onChange={(e) => setEditingContent(e.target.value)}
+                      onBlur={() => handleEditPrompt(prompt.id)}
+                      autoFocus
+                    />
+                  ) : (
+                    <p
+                      className="text-gray-700 mt-2 w-full"
+                      onClick={() => {
+                        setEditingPromptId(prompt.id);
+                        setEditingContent(prompt.content);
+                      }}
+                    >
+                      {prompt.content}
+                    </p>
+                  )}
                 </div>
-
                 <Button size="sm" color="primary" className="mt-4">
                   <a
                     target="_blank"
-                    href={`https://chatgpt.com/?q=${encodeURIComponent(prompt.content)}`}
-                    className=""
+                    href={`https://chatgpt.com/?q=${encodeURIComponent(
+                      prompt.content
+                    )}`}
                   >
                     Open with ChatGPT
                   </a>
                 </Button>
-
                 <Button
                   size="sm"
                   color="danger"
@@ -242,7 +209,6 @@ export default function Home() {
             ))}
           </motion.div>
         </section>
-
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
           <ModalContent>
             {(onClose) => (
