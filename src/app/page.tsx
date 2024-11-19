@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import {
   Button,
@@ -12,6 +12,7 @@ import {
   Input,
   Textarea,
   useDisclosure,
+  Link,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
 
@@ -38,6 +39,15 @@ export default function Home() {
       const response = await axios.get(`${API_BASE_URL}/prompt_fragments`);
       setPrompts(response.data);
       setAllPrompts(response.data);
+      response.data.forEach((prompt: any) => {
+        setTimeout(() => {
+          const textarea = document.getElementById(`prompt-textarea-${prompt.id}`) as HTMLTextAreaElement;
+          if (textarea) {
+            textarea.style.height = "auto";
+            textarea.style.height = `${textarea.scrollHeight}px`;
+          }
+        }, 0);
+      });
     } catch {
       setError("Er is een probleem met het ophalen van de prompts.");
     }
@@ -63,6 +73,13 @@ export default function Home() {
       setAllPrompts([...allPrompts, response.data]);
       setNewPrompt({ content: "", description: "" });
       onClose();
+      setTimeout(() => {
+        const textarea = document.getElementById(`prompt-textarea-${response.data.id}`) as HTMLTextAreaElement;
+        if (textarea) {
+          textarea.style.height = "auto";
+          textarea.style.height = `${textarea.scrollHeight}px`;
+        }
+      }, 0);
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
@@ -78,9 +95,20 @@ export default function Home() {
     }
   };
 
+  const handleEditPrompt = (id: number, newContent: string) => {
+    setPrompts(
+      prompts.map((prompt) =>
+        prompt.id === id ? { ...prompt, content: newContent } : prompt
+      )
+    );
+  };
+
+
   const filterPromptsByTag = (tagId: number) => {
     setSelectedTag(tagId);
-    const filteredPrompts = allPrompts.filter((prompt) => prompt.tags.includes(tagId));
+    const filteredPrompts = allPrompts.filter((prompt) =>
+      prompt.tags.includes(tagId)
+    );
     setPrompts(filteredPrompts);
   };
 
@@ -93,6 +121,11 @@ export default function Home() {
     fetchPrompts();
     fetchTags();
   }, []);
+
+  const autoResizeTextarea = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.target.style.height = "auto";
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  };
 
   return (
     <motion.main
@@ -138,15 +171,13 @@ export default function Home() {
           </motion.div>
 
           <section className="mb-6">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-              Tags
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Tags</h2>
             <div className="flex flex-wrap gap-4">
               {tags.map((tag) => (
                 <button
                   key={tag.id}
                   onClick={() => filterPromptsByTag(tag.id)}
-                  className='bg-primary text-white px-4 py-2 rounded-md'
+                  className="bg-primary text-white px-4 py-2 rounded-md"
                 >
                   {tag.name}
                 </button>
@@ -177,8 +208,28 @@ export default function Home() {
                   <h3 className="text-xl font-semibold text-blue-500">
                     {prompt.description}
                   </h3>
-                  <p className="text-gray-700 mt-2">{prompt.content}</p>
+                  <textarea
+                    id={`prompt-textarea-${prompt.id}`}
+                    className="text-gray-700 mt-2 w-full resize-none overflow-hidden"
+                    rows={1}
+                    value={prompt.content}
+                    onChange={(e) => {
+                      autoResizeTextarea(e);
+                      handleEditPrompt(prompt.id, e.target.value);
+                    }}
+                  />
                 </div>
+
+                <Button size="sm" color="primary" className="mt-4">
+                  <a
+                    target="_blank"
+                    href={`https://chatgpt.com/?q=${encodeURIComponent(prompt.content)}`}
+                    className=""
+                  >
+                    Open with ChatGPT
+                  </a>
+                </Button>
+
                 <Button
                   size="sm"
                   color="danger"
