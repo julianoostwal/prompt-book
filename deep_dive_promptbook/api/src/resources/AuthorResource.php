@@ -93,27 +93,32 @@ class AuthorResource extends Resource {
             'data' => $this->getAuthorById($id),
         ];
     }
-
+    
     public function put($id) {
         $data = $this->getJsonData();
-
+    
         // Check if the user is authorized (admin only for role updates)
         $authUser = $this->getAuthenticatedUser();
-        if (isset($data['role']) && $authUser['role'] !== 'admin') {
+        $stmt = $this->pdo->prepare("SELECT role FROM author WHERE id = :id");
+        $stmt->bindValue(':id', $authUser['id'], \PDO::PARAM_INT);
+        $stmt->execute();
+        $userRole = $stmt->fetchColumn();
+    
+        if (isset($data['role']) && $userRole !== 'admin') {
             throw new \Exception("Access denied. Admin privileges required.", 403);
         }
-
+    
         $stmt = $this->pdo->prepare("UPDATE author SET name = COALESCE(:name, name), role = COALESCE(:role, role) WHERE id = :id");
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
         $stmt->bindValue(':name', $data['name'] ?? null);
         $stmt->bindValue(':role', $data['role'] ?? null);
         $stmt->execute();
-
+    
         return [
             'status' => 200,
             'data' => $this->getAuthorById($id),
         ];
-    }
+    }    
 
     public function delete($id) {
         // Check if the user is authorized to delete (admin only)
