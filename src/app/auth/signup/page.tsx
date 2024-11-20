@@ -3,16 +3,19 @@ import { useState } from "react";
 import { Input, Button } from "@nextui-org/react";
 import api from '@/app/api';
 import { useRouter } from "next/navigation";
+import axios from "axios";
+import { motion } from "framer-motion";
 
 export default function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const [error, setError] = useState<string | null>(null);
 
     const handleSignup = async () => {
         try {
-            await api.post("/authors", {
+            await axios.post("http://5.253.247.243:8000/authors", {
                 name,
                 email,
                 password,
@@ -20,7 +23,11 @@ export default function Signup() {
 
             router.push("/auth/login");
         } catch (error) {
-            console.error("Signup error:", error);
+            if (axios.isAxiosError(error) && error.response) {
+                setError(error.response.data.message);
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 
@@ -35,6 +42,16 @@ export default function Signup() {
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                             Create an account
                         </h1>
+                        {error && (
+                            <motion.div
+                                className="bg-red-500 text-white p-4 rounded-md mb-6"
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <p>{error}</p>
+                            </motion.div>
+                        )}
                         <form className="space-y-4 md:space-y-6" action={handleSignup}>
                             <div>
                                 <Input isRequired value={name} label="Name" onChange={(e) => setName(e.target.value)} />

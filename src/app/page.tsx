@@ -13,6 +13,7 @@ import {
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
 import api from '@/app/api';
+import axios from "axios";
 
 export default function Home() {
   const [prompts, setPrompts] = useState<
@@ -32,9 +33,11 @@ export default function Home() {
   const [editingPromptId, setEditingPromptId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
 
+  const BASE_URL = "http://5.253.247.243:8000";
+  
   const fetchPrompts = async () => {
     try {
-      const response = await api.get(`/prompt_fragments`);
+      const response = await axios.get(`${BASE_URL}/prompt_fragments`);
       setPrompts(response.data);
       setAllPrompts(response.data);
     } catch {
@@ -44,7 +47,7 @@ export default function Home() {
 
   const fetchTags = async () => {
     try {
-      const response = await api.get(`/tags`);
+      const response = await axios.get(`${BASE_URL}/tags`);
       setTags(response.data);
     } catch {
       setError("Er is een probleem met het ophalen van de tags.");
@@ -53,7 +56,7 @@ export default function Home() {
 
   const handleAddPrompt = async () => {
     try {
-      const response = await api.post(`/prompt_fragments`, {
+      const response = await api.post(`${BASE_URL}/prompt_fragments`, {
         content: newPrompt.content,
         description: newPrompt.description,
         author_id: 1,
@@ -69,7 +72,7 @@ export default function Home() {
 
   const handleDeletePrompt = async (id: number) => {
     try {
-      await api.delete(`/prompt_fragments/${id}`);
+      await axios.delete(`${BASE_URL}/prompt_fragments/${id}`);
       setPrompts(prompts.filter((prompt) => prompt.id !== id));
       setAllPrompts(allPrompts.filter((prompt) => prompt.id !== id));
     } catch {

@@ -3,13 +3,17 @@ import { FormEvent, useState } from "react";
 import { Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/AuthContext";
-import api from '@/app/api';
+import { motion } from "framer-motion";
+import { isAxiosError } from "axios";
+import api from "@/app/api";
+
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
     const { login } = useAuth();
-
+    const [error, setError] = useState<string | null>(null);
+    
     const handleLogin = async (event: FormEvent) => {
         event.preventDefault();
         try {
@@ -21,7 +25,11 @@ export default function Login() {
             login(response.data.token);
             router.push("/");
         } catch (error) {
-            console.error("Login error:", error);
+            if (isAxiosError(error) && error.response) {
+                setError(error.response?.data?.message || "Login failed. Please try again.");
+            } else {
+                setError("An unexpected error occurred");
+            }
         }
     };
 
@@ -31,6 +39,16 @@ export default function Login() {
                 <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                     Fietsende K.I.P
                 </div>
+                {error && (
+                    <motion.div
+                        className="bg-red-500 text-white p-4 rounded-md mb-6"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <p>{error}</p>
+                    </motion.div>
+                    )}
                 <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
