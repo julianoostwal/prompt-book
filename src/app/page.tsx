@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Button,
   Modal,
@@ -13,8 +12,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
-
-const API_BASE_URL = "http://5.253.247.243:8000";
+import api from '@/app/api';
 
 export default function Home() {
   const [prompts, setPrompts] = useState<
@@ -36,7 +34,7 @@ export default function Home() {
 
   const fetchPrompts = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/prompt_fragments`);
+      const response = await api.get(`/prompt_fragments`);
       setPrompts(response.data);
       setAllPrompts(response.data);
     } catch {
@@ -46,7 +44,7 @@ export default function Home() {
 
   const fetchTags = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/tags`);
+      const response = await api.get(`/tags`);
       setTags(response.data);
     } catch {
       setError("Er is een probleem met het ophalen van de tags.");
@@ -55,7 +53,7 @@ export default function Home() {
 
   const handleAddPrompt = async () => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/prompt_fragments`, {
+      const response = await api.post(`/prompt_fragments`, {
         content: newPrompt.content,
         description: newPrompt.description,
         author_id: 1,
@@ -69,9 +67,9 @@ export default function Home() {
     }
   };
 
-  const handleDeletePrompt = async (id) => {
+  const handleDeletePrompt = async (id: number) => {
     try {
-      await axios.delete(`${API_BASE_URL}/prompt_fragments/${id}`);
+      await api.delete(`/prompt_fragments/${id}`);
       setPrompts(prompts.filter((prompt) => prompt.id !== id));
       setAllPrompts(allPrompts.filter((prompt) => prompt.id !== id));
     } catch {
@@ -79,7 +77,7 @@ export default function Home() {
     }
   };
 
-  const handleEditPrompt = async (id) => {
+  const handleEditPrompt = async (id: number) => {
     try {
       setPrompts(
         prompts.map((prompt) =>
@@ -93,7 +91,7 @@ export default function Home() {
     }
   };
 
-  const filterPromptsByTag = (tagId) => {
+  const filterPromptsByTag = (tagId: number) => {
     setSelectedTag(tagId);
     const filteredPrompts = allPrompts.filter((prompt) =>
       prompt.tags.includes(tagId)

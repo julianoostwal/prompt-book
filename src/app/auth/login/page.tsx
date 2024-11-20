@@ -2,9 +2,8 @@
 import { FormEvent, useState } from "react";
 import { Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { useAuth } from "@/app/components/AuthContext";
-
+import api from '@/app/api';
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -14,7 +13,7 @@ export default function Login() {
     const handleLogin = async (event: FormEvent) => {
         event.preventDefault();
         try {
-            const response = await axios.post("http://5.253.247.243:8000/auth/login", {
+            const response = await api.post("/auth/login", {
                 email,
                 password,
             });
@@ -63,7 +62,7 @@ export default function Login() {
                                 Sign in
                             </button>
                             <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                                Don&apos;t have an account yet? <a href="#" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
+                                Don&apos;t have an account yet? <a href="/auth/signup" className="font-medium text-primary-600 hover:underline dark:text-primary-500">Sign up</a>
                             </p>
                         </form>
                     </div>
