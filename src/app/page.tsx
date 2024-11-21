@@ -12,14 +12,18 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
-import api from '@/app/api';
+import api from "@/app/api";
 import axios from "axios";
 
 export default function Home() {
   const [prompts, setPrompts] = useState<
     {
-      author: ReactNode; id: number; content: string; description: string; tags: number[] 
-}[]
+      author: ReactNode;
+      id: number;
+      content: string;
+      description: string;
+      tags: number[];
+    }[]
   >([]);
   const [allPrompts, setAllPrompts] = useState<
     { id: number; content: string; description: string; tags: number[] }[]
@@ -27,6 +31,7 @@ export default function Home() {
   const [tags, setTags] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { isOpen: tagsIsOpen, onOpen: tagsOnOpen , onOpenChange: tagsChange, onClose: tagsClose } = useDisclosure();
   const [newPrompt, setNewPrompt] = useState({
     content: "",
     description: "",
@@ -36,7 +41,7 @@ export default function Home() {
   const [editingContent, setEditingContent] = useState("");
 
   const BASE_URL = "http://5.253.247.243:8000";
-  
+
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/prompt_fragments`);
@@ -191,7 +196,9 @@ export default function Home() {
                   <h3 className="text-xl font-semibold text-blue-500">
                     {prompt.description}
                   </h3>
-                  <h4 className="font-bold text-primary">@{JSON.parse(prompt.author).name}</h4>
+                  <h4 className="font-bold text-primary">
+                    @{JSON.parse(prompt.author).name}
+                  </h4>
                   {editingPromptId === prompt.id ? (
                     <Textarea
                       value={editingContent}
