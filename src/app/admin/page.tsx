@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -12,8 +12,11 @@ import {
   Input,
   Textarea,
   useDisclosure,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
+import api from "../api";
 
 const API_BASE_URL = "http://5.253.247.243:8000";
 
@@ -26,13 +29,25 @@ export default function Admin() {
       role: string;
       created_at: string;
       updated_at: string;
+      last_login: string;
     }[]
   >([]);
 
   const { isOpen, onOpenChange } = useDisclosure();
+  const { isOpen: userCreateOpen, onOpenChange: userCreateChange } =
+    useDisclosure();
   const [error, setError] = useState<string | null>(null);
   const [editUser, setEditUser] = useState({
-    id: 0, name: "", email: "", role: "",
+    id: 0,
+    name: "",
+    email: "",
+    role: "",
+  });
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    role: "",
+    password: "",
   });
 
   useEffect(() => {
@@ -51,7 +66,7 @@ export default function Admin() {
 
   async function handleDeleteUser(id: number) {
     try {
-      await axios.delete(`${API_BASE_URL}/authors/${id}`);
+      await api.delete(`${API_BASE_URL}/authors/${id}`);
       fetchUsers();
     } catch {
       setError("Er is een probleem met het verwijderen van de user.");
@@ -59,18 +74,39 @@ export default function Admin() {
   }
 
   async function handleEditUserSubmit(id: number) {
+    console.log("Sending edit request for user:", editUser); // Log om te zien welke data wordt verstuurd
     try {
-      await axios.put(`${API_BASE_URL}/authors/${id}`, editUser);
+      await api.put(`${API_BASE_URL}/authors/${id}`, {
+        name: editUser.name,
+        email: editUser.email,
+        role: editUser.role,
+      });
+      console.log("Edit request was successful"); // Log wanneer het verzoek succesvol is
       fetchUsers();
       onOpenChange(false);
-    } catch {
+    } catch (error) {
+      console.error("Er is een probleem met het bewerken van de user:", error);
       setError("Er is een probleem met het bewerken van de user.");
+    }
+  }
+
+  async function handleCreateUserSubmit() {
+    try {
+      await api.post(`${API_BASE_URL}/authors`, newUser);
+      fetchUsers();
+      userCreateChange(false);
+      setNewUser({ name: "", email: "", role: "" });
+    } catch {
+      setError("Er is een probleem met het aanmaken van de user.");
     }
   }
 
   function openEditModal(user: (typeof users)[number]) {
     setEditUser({
-      id: user.id, name: user.name, email: user.email, role: user.role,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
     });
     onOpenChange(true);
   }
@@ -87,7 +123,80 @@ export default function Admin() {
           <p>{error}</p>
         </motion.div>
       )}
-      <h1 className="font-bold text-3xl">Admin</h1>
+      <div className="flex justify-between mb-4">
+        <h1 className="font-bold text-3xl">Admin</h1>
+        <Button
+          onPress={userCreateChange}
+          className="uppercase btn bg-primary text-white"
+        >
+          Create new user
+        </Button>
+        <Modal
+          isOpen={userCreateOpen}
+          onOpenChange={userCreateChange}
+        >
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Create new user
+                </ModalHeader>
+                <ModalBody>
+                  <Input
+                    label="Naam"
+                    value={newUser.name}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, name: e.target.value })
+                    }
+                  />
+                  <Input
+                    label="E-mail"
+                    value={newUser.email}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, email: e.target.value })
+                    }
+                  />
+                  <Input
+                  type="password"
+                    label="Password"
+                    value={newUser.password}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, password: e.target.value })
+                    }
+                  />
+                  <Select
+                    label="Chose a role"
+                    value={newUser.role}
+                    onChange={(e) =>
+                      setNewUser({ ...newUser, role: e.target.value })
+                    }
+                  >
+                    {["user", "admin"].map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Sluiten
+                  </Button>
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      handleCreateUserSubmit();
+                      onClose();
+                    }}
+                  >
+                    Opslaan
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      </div>
 
       <div className="relative overflow-x-auto">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -103,7 +212,7 @@ export default function Admin() {
                 Role
               </th>
               <th scope="col" className="px-6 py-3">
-                Created at
+                Last login
               </th>
               <th></th>
               <th></th>
@@ -124,7 +233,7 @@ export default function Admin() {
                 </th>
                 <td className="px-6 py-4">{user.email}</td>
                 <td className="px-6 py-4">{user.role}</td>
-                <td className="px-6 py-4">{user.created_at}</td>
+                <td className="px-6 py-4">{user.last_login}</td>
                 <td>
                   <Button
                     onClick={() => openEditModal(user)}
@@ -156,21 +265,30 @@ export default function Admin() {
                   <Input
                     label="Naam"
                     value={editUser.name}
-                    onChange={(e) => setEditUser({ ...editUser, name: e.target.value })
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, name: e.target.value })
                     }
                   />
                   <Input
                     label="E-mail"
                     value={editUser.email}
-                    onChange={(e) => setEditUser({ ...editUser, email: e.target.value })
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, email: e.target.value })
                     }
                   />
-                  <Input
+                  <Select
                     label="Rol"
                     value={editUser.role}
-                    onChange={(e) => setEditUser({ ...editUser, role: e.target.value })
+                    onChange={(e) =>
+                      setEditUser({ ...editUser, role: e.target.value })
                     }
-                  />
+                  >
+                    {["user", "admin"].map((role) => (
+                      <SelectItem key={role} value={role}>
+                        {role}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="light" onPress={onClose}>
@@ -178,8 +296,9 @@ export default function Admin() {
                   </Button>
                   <Button
                     color="primary"
-                    onClick={() => handleEditUserSubmit(editUser.id)}
-                    onPress={onClose}
+                    onClick={() => {
+                      handleEditUserSubmit(editUser.id);
+                    }}
                   >
                     Opslaan
                   </Button>
