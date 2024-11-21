@@ -17,7 +17,9 @@ import axios from "axios";
 
 export default function Home() {
   const [prompts, setPrompts] = useState<
-    { id: number; content: string; description: string; tags: number[] }[]
+    {
+      author: ReactNode; id: number; content: string; description: string; tags: number[] 
+}[]
   >([]);
   const [allPrompts, setAllPrompts] = useState<
     { id: number; content: string; description: string; tags: number[] }[]
@@ -206,6 +208,7 @@ export default function Home() {
                   <h3 className="text-xl font-semibold text-blue-500">
                     {prompt.description}
                   </h3>
+                  <h4 className="font-bold text-primary">@{JSON.parse(prompt.author).name}</h4>
                   {editingPromptId === prompt.id ? (
                     <Textarea
                       value={editingContent}
