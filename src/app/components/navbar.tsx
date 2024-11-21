@@ -55,8 +55,8 @@ export default function App() {
       </NavbarBrand>
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Link color="primary" href="/">
-            Features
+          <Link color="primary" href="/ai">
+            ChatGPT Prompt
           </Link>
         </NavbarItem>
         {user.role === "admin" && (
