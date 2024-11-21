@@ -60,17 +60,37 @@ class AuthorResource extends Resource {
 
     public function post() {
         $data = $this->getJsonData();
-
+    
+        // Check if all required fields are provided
         if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
             throw new \Exception("Name, email, and password are required", 400);
         }
-
+    
+        // Get authenticated user
+        $authUser = $this->getAuthenticatedUser();
+    
+        // Ensure the user is logged in before proceeding
+        if (!$authUser) {
+            throw new \Exception("Access denied. You must be logged in to create an account.", 401);
+        }
+    
+        // Fetch the authenticated user's role directly from the database
+        $stmt = $this->pdo->prepare("SELECT role FROM author WHERE id = :id");
+        $stmt->bindValue(':id', $authUser['id'], \PDO::PARAM_INT);
+        $stmt->execute();
+        $userRole = $stmt->fetchColumn();
+    
+        // Only admins can create other admins
+        if (isset($data['role']) && $data['role'] === 'admin' && $userRole !== 'admin') {
+            throw new \Exception("Access denied. Admin privileges required to create an admin account.", 403);
+        }
+    
+        // Set the role: if the role is not specified or is not valid, default to 'user'
+        $role = isset($data['role']) && in_array($data['role'], ['admin', 'user']) ? $data['role'] : 'user';
+    
         // Hash the password
         $passwordHash = password_hash($data['password'], PASSWORD_BCRYPT);
-
-        // Use provided role or default to 'user'
-        $role = isset($data['role']) && in_array($data['role'], ['admin', 'user']) ? $data['role'] : 'user';
-
+    
         // Insert into the database
         $stmt = $this->pdo->prepare("INSERT INTO author (name, role, email, password_hash) VALUES (:name, :role, :email, :password_hash)");
         $stmt->bindValue(':name', $data['name']);
@@ -78,14 +98,16 @@ class AuthorResource extends Resource {
         $stmt->bindValue(':email', $data['email']);
         $stmt->bindValue(':password_hash', $passwordHash);
         $stmt->execute();
-
+    
         $authorId = $this->pdo->lastInsertId();
-
+    
         return [
             'status' => 201,
             'data' => $this->getAuthorById($authorId),
         ];
     }
+    
+    
 
     public function getById($id) {
         return [

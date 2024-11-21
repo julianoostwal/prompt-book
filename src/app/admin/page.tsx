@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import {
   Button,
   Modal,
@@ -10,7 +10,6 @@ import {
   ModalBody,
   ModalFooter,
   Input,
-  Textarea,
   useDisclosure,
   Select,
   SelectItem,
@@ -58,9 +57,12 @@ export default function Admin() {
     try {
       const response = await axios.get(`${API_BASE_URL}/authors`);
       setUsers(response.data);
-      console.log(response.data);
     } catch {
-      setError("Er is een probleem met het ophalen van de users.");
+      if (isAxiosError(error) && error.response) {
+        setError(error.response?.data?.message || "Login failed. Please try again.");
+      } else {
+          setError("An unexpected error occurred");
+      }
     }
   }
 
@@ -69,24 +71,29 @@ export default function Admin() {
       await api.delete(`${API_BASE_URL}/authors/${id}`);
       fetchUsers();
     } catch {
-      setError("Er is een probleem met het verwijderen van de user.");
+      if (isAxiosError(error) && error.response) {
+        setError(error.response?.data?.message || "Login failed. Please try again.");
+      } else {
+          setError("An unexpected error occurred");
+      }
     }
   }
 
   async function handleEditUserSubmit(id: number) {
-    console.log("Sending edit request for user:", editUser); // Log om te zien welke data wordt verstuurd
     try {
       await api.put(`${API_BASE_URL}/authors/${id}`, {
         name: editUser.name,
         email: editUser.email,
         role: editUser.role,
       });
-      console.log("Edit request was successful"); // Log wanneer het verzoek succesvol is
       fetchUsers();
-      onOpenChange(false);
+      onOpenChange();
     } catch (error) {
-      console.error("Er is een probleem met het bewerken van de user:", error);
-      setError("Er is een probleem met het bewerken van de user.");
+      if (isAxiosError(error) && error.response) {
+        setError(error.response?.data?.message || "Login failed. Please try again.");
+    } else {
+        setError("An unexpected error occurred");
+    }
     }
   }
 
@@ -94,10 +101,14 @@ export default function Admin() {
     try {
       await api.post(`${API_BASE_URL}/authors`, newUser);
       fetchUsers();
-      userCreateChange(false);
-      setNewUser({ name: "", email: "", role: "" });
+      userCreateChange();
+      setNewUser({ name: "", email: "", role: "", password: "" });
     } catch {
-      setError("Er is een probleem met het aanmaken van de user.");
+      if (isAxiosError(error) && error.response) {
+        setError(error.response?.data?.message || "Login failed. Please try again.");
+      } else {
+          setError("An unexpected error occurred");
+      }
     }
   }
 
@@ -108,7 +119,7 @@ export default function Admin() {
       email: user.email,
       role: user.role,
     });
-    onOpenChange(true);
+    onOpenChange();
   }
 
   return (
