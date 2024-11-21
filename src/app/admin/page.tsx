@@ -18,7 +18,7 @@ import {
 import { motion } from "framer-motion";
 import api from "../api";
 
-const API_BASE_URL = "http://5.253.247.243:8002";
+const API_BASE_URL = "http://5.253.247.243:8000";
 
 export default function Admin() {
   const [users, setUsers] = useState<

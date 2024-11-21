@@ -20,4 +20,4 @@ ENV DB_PASS=bit_academy
 EXPOSE 8000
 
 # Start the PHP development server
-CMD ["php", "-S", "0.0.0.0:8002", "src/router.php"]
+CMD ["php", "-S", "0.0.0.0:8000", "src/router.php"]
