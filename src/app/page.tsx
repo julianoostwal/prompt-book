@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -12,8 +13,9 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
-import api from "@/app/api";
 import axios from "axios";
+import api from "@/app/api";
+import { useRouter } from "next/navigation";
 import askai from "./openai";
 
 export default function Home() {
@@ -29,13 +31,23 @@ export default function Home() {
   const [allPrompts, setAllPrompts] = useState<
     { id: number, content: string, description: string, tags: number[]; author: { id: number; name: string; email: string }}[]
   >([]);
+  const [allTags, setAllTags] = useState<{ id: number; name: string }[]>([]);
   const [tags, setTags] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const { isOpen: tagsIsOpen, onOpen: tagsOnOpen , onOpenChange: tagsChange, onClose: tagsClose } = useDisclosure();
+  const {
+    isOpen: tagsIsOpen,
+    onOpen: tagsOnOpen,
+    onOpenChange: tagsChange,
+    onClose: tagsClose,
+  } = useDisclosure();
   const [newPrompt, setNewPrompt] = useState({
     content: "",
     description: "",
+  });
+  const [newTag, setNewTag] = useState({
+    id: 0,
+    name: "",
   });
   const [selectedTag, setSelectedTag] = useState<number | null>(null);
   const [editingPromptId, setEditingPromptId] = useState<number | null>(null);
@@ -43,17 +55,19 @@ export default function Home() {
   const [user, setUser] = useState({
     id: 0,
     name: "",
-    email: ""
+    email: "",
   });
   const [isGenerating, setIsGenerating] = useState(false);
 
 
   const BASE_URL = "http://5.253.247.243:8000";
 
+  const router = useRouter();
+
   const fetchUser = async () => {
     const response = await api.get(`${BASE_URL}/auth/status`).catch(() => {});
     if (response) setUser(response.data);
-  }
+  };
 
   const fetchPrompts = async () => {
     try {
@@ -87,18 +101,31 @@ export default function Home() {
       setNewPrompt({ content: "", description: "" });
       onClose();
     } else {
-      setPrompts([...prompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
-      setAllPrompts([...allPrompts, {
-        ...newPrompt, tags: [], id: 0,
-        author: {
-          id: 0,
-          name: "",
-          email: ""
-        }
-      }]);
+      setPrompts([...prompts, {...newPrompt, tags: [], id: 0}]);
+      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0}]);
       setNewPrompt({ content: "", description: "" });
       onClose();
     }
+    } catch {
+      setError("Er is een probleem met het toevoegen van de prompt.");
+    }
+  };
+  const handleAddTagPrompt = async () => {
+    try {
+      if (user && user.id !== 0) {
+        const response = await api.post(`${BASE_URL}/tags`, {
+          name: newTag.name,
+          author_id: user.id,
+        });
+        setTags([...tags, response.data]);
+        setAllTags([...allTags, response.data]);
+        setNewTag({ name: "", id: 0 });
+        tagsClose();
+      } else {
+        setError("Je bent niet ingelogd.");
+        router.push("/auth/login");
+        tagsClose();
+      }
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
@@ -198,6 +225,9 @@ export default function Home() {
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Beschikbare ChatGPT Prompts
             </h2>
+            <Button color="primary" onPress={tagsOnOpen}>
+              Voeg nieuwe tag toe
+            </Button>
             <Button color="primary" onPress={onOpen}>
               Voeg nieuwe prompt toe
             </Button>
@@ -317,6 +347,37 @@ export default function Home() {
                     Sluiten
                   </Button>
                   <Button color="primary" onPress={handleAddPrompt}>
+                    Opslaan
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={tagsIsOpen} onOpenChange={tagsChange}>
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Maak nieuwe tag aan
+                </ModalHeader>
+                <ModalBody>
+                  <Input
+                    label="Tag Name"
+                    value={newTag.name}
+                    onChange={(e) =>
+                      setNewTag({
+                        ...newTag,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Sluiten
+                  </Button>
+                  <Button color="primary" onPress={handleAddTagPrompt}>
                     Opslaan
                   </Button>
                 </ModalFooter>
