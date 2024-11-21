@@ -15,7 +15,7 @@ export default function Signup() {
 
     const handleSignup = async () => {
         try {
-            await axios.post("http://5.253.247.243:8000/authors", {
+            await axios.post("http://5.253.247.243:8002/authors", {
                 name,
                 email,
                 password,

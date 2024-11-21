@@ -15,7 +15,7 @@ import {
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
 
-const API_BASE_URL = "http://5.253.247.243:8000";
+const API_BASE_URL = "http://5.253.247.243:8002";
 
 export default function Admin() {
   const [users, setUsers] = useState<

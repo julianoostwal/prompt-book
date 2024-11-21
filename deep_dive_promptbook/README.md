@@ -8,7 +8,7 @@ From `/api` folder.
 docker stop deep_dive_api_container
 docker rm deep_dive_api_container
 docker build -t deep_dive_api .
-docker run -d -p 8000:8000 --link deep_dive_database_container:db --name deep_dive_api_container deep_dive_api
+docker run -d -p 8000:8002 --link deep_dive_database_container:db --name deep_dive_api_container deep_dive_api
 ```
 
 ## database

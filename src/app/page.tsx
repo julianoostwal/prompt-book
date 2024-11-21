@@ -33,7 +33,7 @@ export default function Home() {
   const [editingPromptId, setEditingPromptId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
 
-  const BASE_URL = "http://5.253.247.243:8000";
+  const BASE_URL = "http://5.253.247.243:8002";
   
   const fetchPrompts = async () => {
     try {
