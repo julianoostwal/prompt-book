@@ -88,7 +88,14 @@ export default function Home() {
       onClose();
     } else {
       setPrompts([...prompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
-      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0}]);
+      setAllPrompts([...allPrompts, {
+        ...newPrompt, tags: [], id: 0,
+        author: {
+          id: 0,
+          name: "",
+          email: ""
+        }
+      }]);
       setNewPrompt({ content: "", description: "" });
       onClose();
     }
