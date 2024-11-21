@@ -39,8 +39,17 @@ export default function Home() {
   const [selectedTag, setSelectedTag] = useState<number | null>(null);
   const [editingPromptId, setEditingPromptId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
-
+  const [user, setUser] = useState({
+    id: 0,
+    name: "",
+    email: ""
+  });
   const BASE_URL = "http://5.253.247.243:8000";
+
+  const fetchUser = async () => {
+    const response = await api.get(`${BASE_URL}/auth/status`).catch(() => {});
+    if (response) setUser(response.data);
+  }
 
   const fetchPrompts = async () => {
     try {
@@ -63,15 +72,22 @@ export default function Home() {
 
   const handleAddPrompt = async () => {
     try {
+      if (user && user.id !== 0) {
       const response = await api.post(`${BASE_URL}/prompt_fragments`, {
         content: newPrompt.content,
         description: newPrompt.description,
-        author_id: 1,
+        author_id: user.id,
       });
       setPrompts([...prompts, response.data]);
       setAllPrompts([...allPrompts, response.data]);
       setNewPrompt({ content: "", description: "" });
       onClose();
+    } else {
+      setPrompts([...prompts, {...newPrompt, tags: [], id: 0}]);
+      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0}]);
+      setNewPrompt({ content: "", description: "" });
+      onClose();
+    }
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
@@ -117,6 +133,7 @@ export default function Home() {
   useEffect(() => {
     fetchPrompts();
     fetchTags();
+    fetchUser();
   }, []);
 
   return (
