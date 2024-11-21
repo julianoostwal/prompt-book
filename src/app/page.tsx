@@ -152,6 +152,26 @@ export default function Home() {
               Voeg nieuwe prompt toe
             </Button>
           </motion.div>
+          <section className="mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Tags</h2>
+            <div className="flex flex-wrap gap-4">
+              {tags.map((tag) => (
+                <button
+                  key={tag.id}
+                  onClick={() => filterPromptsByTag(tag.id)}
+                  className="bg-primary text-white px-4 py-2 rounded-md"
+                >
+                  {tag.name}
+                </button>
+              ))}
+              <button
+                onClick={resetFilter}
+                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md"
+              >
+                Toon Alle
+              </button>
+            </div>
+          </section>
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4"
             initial={{ opacity: 0 }}

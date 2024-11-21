@@ -7,6 +7,17 @@ namespace DeepDiveAPI;
 // Load the Composer autoloader from the vendor directory one level up from the current directory
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Handle CORS headers for all requests
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+// Handle preflight OPTIONS-verzoeken (preflight requests)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 // Register routes
 // request method, path(regex), resource, method
 $routes = [
@@ -58,16 +69,6 @@ $routes = [
     ['put',     '/^context_files\/([0-9]+)$/i', 'ContextFileResource', 'put'],
     ['delete',  '/^context_files\/([0-9]+)$/i', 'ContextFileResource', 'delete'],
 ];
-
-// Disable CORS errors
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-
-// handle preflight requests
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    header("Access-Control-Allow-Headers: Content-Type");
-    exit();
-}
 
 // Get the HTTP method
 $methodName = match ($_SERVER['REQUEST_METHOD']) {
