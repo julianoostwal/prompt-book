@@ -31,6 +31,12 @@ export default function Admin() {
       last_login: string;
     }[]
   >([]);
+  const [tags, setTags] = useState<
+    {
+      id: number;
+      name: string;
+    }[]
+  >([]);
 
   const { isOpen, onOpenChange } = useDisclosure();
   const { isOpen: userCreateOpen, onOpenChange: userCreateChange } =
@@ -51,6 +57,7 @@ export default function Admin() {
 
   useEffect(() => {
     fetchUsers();
+    fetchTags();
   }, []);
 
   async function fetchUsers() {
@@ -61,7 +68,20 @@ export default function Admin() {
       if (isAxiosError(error) && error.response) {
         setError(error.response?.data?.message || "Failed to fetch users");
       } else {
-          setError("An unexpected error occurred");
+        setError("An unexpected error occurred");
+      }
+    }
+  }
+
+  async function fetchTags() {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/tags`);
+      setTags(response.data);
+    } catch {
+      if (isAxiosError(error) && error.response) {
+        setError(error.response?.data?.message || "Failed to fetch tags");
+      } else {
+        setError("An unexpected error occurred");
       }
     }
   }
@@ -74,7 +94,20 @@ export default function Admin() {
       if (isAxiosError(error) && error.response) {
         setError(error.response?.data?.message || "Failed to delete user");
       } else {
-          setError("An unexpected error occurred");
+        setError("An unexpected error occurred");
+      }
+    }
+  }
+
+  async function handleDeleteTags(id: number) {
+    try {
+      await api.delete(`${API_BASE_URL}/tags/${id}`);
+      fetchTags();
+    } catch {
+      if (isAxiosError(error) && error.response) {
+        setError(error.response?.data?.message || "Failed to delete tag");
+      } else {
+        setError("An unexpected error occurred");
       }
     }
   }
@@ -91,9 +124,9 @@ export default function Admin() {
     } catch (error) {
       if (isAxiosError(error) && error.response) {
         setError(error.response?.data?.message || "Failed to update user");
-    } else {
+      } else {
         setError("An unexpected error occurred");
-    }
+      }
     }
   }
 
@@ -102,12 +135,17 @@ export default function Admin() {
       await api.post(`${API_BASE_URL}/authors`, newUser);
       fetchUsers();
       userCreateChange();
-      setNewUser({ name: "", email: "", role: "", password: "" });
+      setNewUser({
+        name: "",
+        email: "",
+        role: "",
+        password: "",
+      });
     } catch {
       if (isAxiosError(error) && error.response) {
         setError(error.response?.data?.message || "Failed to create user");
       } else {
-          setError("An unexpected error occurred");
+        setError("An unexpected error occurred");
       }
     }
   }
@@ -142,10 +180,7 @@ export default function Admin() {
         >
           Create new user
         </Button>
-        <Modal
-          isOpen={userCreateOpen}
-          onOpenChange={userCreateChange}
-        >
+        <Modal isOpen={userCreateOpen} onOpenChange={userCreateChange}>
           <ModalContent>
             {(onClose) => (
               <>
@@ -168,7 +203,7 @@ export default function Admin() {
                     }
                   />
                   <Input
-                  type="password"
+                    type="password"
                     label="Password"
                     value={newUser.password}
                     onChange={(e) =>
@@ -318,6 +353,44 @@ export default function Admin() {
             )}
           </ModalContent>
         </Modal>
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Id
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Name
+              </th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {tags.map((tag) => (
+              <tr
+                key={tag.id}
+                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+              >
+                <th
+                  scope="row"
+                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                >
+                  {tag.id}
+                </th>
+                <td className="px-6 py-4">{tag.name}</td>
+                <td>
+                  <Button
+                    onClick={() => handleDeleteTags(tag.id)}
+                    className="btn bg-danger text-white"
+                  >
+                    Delete
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </main>
   );
