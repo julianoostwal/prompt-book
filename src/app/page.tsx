@@ -14,11 +14,12 @@ import {
 import { motion } from "framer-motion";
 import api from "@/app/api";
 import axios from "axios";
+import askai from "./openai";
 
 export default function Home() {
   const [prompts, setPrompts] = useState<
     {
-      author: ReactNode;
+      author: { id: number; name: string; email: string };
       id: number;
       content: string;
       description: string;
@@ -26,7 +27,7 @@ export default function Home() {
     }[]
   >([]);
   const [allPrompts, setAllPrompts] = useState<
-    { id: number; content: string; description: string; tags: number[] }[]
+    { id: number, content: string, description: string, tags: number[]; author: { id: number; name: string; email: string }}[]
   >([]);
   const [tags, setTags] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +45,9 @@ export default function Home() {
     name: "",
     email: ""
   });
+  const [isGenerating, setIsGenerating] = useState(false);
+
+
   const BASE_URL = "http://5.253.247.243:8000";
 
   const fetchUser = async () => {
@@ -83,7 +87,7 @@ export default function Home() {
       setNewPrompt({ content: "", description: "" });
       onClose();
     } else {
-      setPrompts([...prompts, {...newPrompt, tags: [], id: 0}]);
+      setPrompts([...prompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
       setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0}]);
       setNewPrompt({ content: "", description: "" });
       onClose();
@@ -128,6 +132,21 @@ export default function Home() {
   const resetFilter = () => {
     setSelectedTag(null);
     setPrompts(allPrompts);
+  };
+
+
+  const generateContent = async () => {
+    setIsGenerating(true);
+    try {
+      const description = `Create a ChatGPT prompt that instructs the AI to act as a ${newPrompt.description}. Ensure the prompt is clear, concise, and encourages engaging interactions.`;
+      const response = await askai(description);
+
+      setNewPrompt({ ...newPrompt, content: response || "" });
+    } catch {
+      setError("Er is een probleem met het genereren van de prompt content.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   useEffect(() => {
@@ -275,6 +294,9 @@ export default function Home() {
                       })
                     }
                   />
+                  <Button onClick={generateContent} disabled={isGenerating}>
+                    {isGenerating ? "Generating..." : "Generate prompt content with AI"}
+                  </Button>
                   <Textarea
                     label="Content"
                     value={newPrompt.content}

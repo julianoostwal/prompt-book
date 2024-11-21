@@ -2,7 +2,7 @@
 import { FormEvent, useState } from "react";
 import { Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/components/AuthContext";
+import { useAuth } from "@/components/AuthContext";
 import { motion } from "framer-motion";
 import { isAxiosError } from "axios";
 import api from "@/app/api";
