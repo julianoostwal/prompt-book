@@ -59,7 +59,7 @@ export default function Admin() {
       setUsers(response.data);
     } catch {
       if (isAxiosError(error) && error.response) {
-        setError(error.response?.data?.message || "Login failed. Please try again.");
+        setError(error.response?.data?.message || "Failed to fetch users");
       } else {
           setError("An unexpected error occurred");
       }
@@ -72,7 +72,7 @@ export default function Admin() {
       fetchUsers();
     } catch {
       if (isAxiosError(error) && error.response) {
-        setError(error.response?.data?.message || "Login failed. Please try again.");
+        setError(error.response?.data?.message || "Failed to delete user");
       } else {
           setError("An unexpected error occurred");
       }
@@ -90,7 +90,7 @@ export default function Admin() {
       onOpenChange();
     } catch (error) {
       if (isAxiosError(error) && error.response) {
-        setError(error.response?.data?.message || "Login failed. Please try again.");
+        setError(error.response?.data?.message || "Failed to update user");
     } else {
         setError("An unexpected error occurred");
     }
@@ -105,7 +105,7 @@ export default function Admin() {
       setNewUser({ name: "", email: "", role: "", password: "" });
     } catch {
       if (isAxiosError(error) && error.response) {
-        setError(error.response?.data?.message || "Login failed. Please try again.");
+        setError(error.response?.data?.message || "Failed to create user");
       } else {
           setError("An unexpected error occurred");
       }
