@@ -2,8 +2,9 @@
 
 import { Button, Input } from "@nextui-org/react";
 import askai from "../openai";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Typewriter from 'typewriter-effect';
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 export default function Ai() {
   const [question, setQuestion] = useState("");
@@ -11,12 +12,12 @@ export default function Ai() {
 
   async function ai1() {
     const response = await askai(question);
-    setAnswer(response);
+    setAnswer(response || "");
     setQuestion("");
 
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: { key: string; }) {
     if (event.key === "Enter") {
       ai1();
     }
@@ -47,7 +48,7 @@ export default function Ai() {
         </Button>
         {answer && (
           <div className="p-4 bg-gray-800 border border-gray-700 rounded-md">
-            <p>{answer}</p>
+            <TextGenerateEffect duration={1} filter={false} words={answer} />
           </div>
         )}
       </div>

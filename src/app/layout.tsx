@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
-import Navbar from "./components/navbar";
-import { AuthProvider } from "./components/AuthContext";
+import Navbar from "../components/navbar";
+import { AuthProvider } from "../components/AuthContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
