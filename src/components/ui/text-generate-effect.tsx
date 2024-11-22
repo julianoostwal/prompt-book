@@ -1,7 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect } from "react";
 import { motion, stagger, useAnimate } from "framer-motion";
-import { cn } from "@/lib/utils";
 
 export const TextGenerateEffect = ({
   words,
@@ -51,7 +51,7 @@ export const TextGenerateEffect = ({
   };
 
   return (
-    <div className={cn("", className)}>
+    <div className={className}>
       <div className="mt-4">
         <div className=" text-white text-sm leading-snug tracking-wide">
           {renderWords()}
