@@ -1,17 +1,17 @@
 "use client";
 import { useState } from "react";
 import { Input, Button } from "@nextui-org/react";
-import api from '@/app/api';
-import { useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     const handleSignup = async () => {
         try {
@@ -22,7 +22,7 @@ export default function Signup() {
             });
 
             router.push("/auth/login");
-        } catch (error) {
+        } catch {
             if (axios.isAxiosError(error) && error.response) {
                 setError(error.response.data.message);
             } else {
@@ -34,9 +34,9 @@ export default function Signup() {
     return (
         <main className="min-h-screen container mx-auto">
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-                <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+                <Link href="/" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
                     Fietsende K.I.P    
-                </a>
+                </Link>
                 <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                         <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
@@ -60,7 +60,7 @@ export default function Signup() {
                                 <Input isRequired value={email} label="Email" type="email" onChange={(e) => setEmail(e.target.value)} />
                             </div>
                             <div>
-                                <Input isRequired value={password} label="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
+                                <Input isRequired value={password} label="Password" type="password" min={8} onChange={(e) => setPassword(e.target.value)} />
                             </div>
                             <Button type="submit" className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800" onClick={handleSignup}>
                                 Sign Up

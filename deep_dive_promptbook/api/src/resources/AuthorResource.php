@@ -69,11 +69,6 @@ class AuthorResource extends Resource {
         // Get authenticated user
         $authUser = $this->getAuthenticatedUser();
     
-        // Ensure the user is logged in before proceeding
-        if (!$authUser) {
-            throw new \Exception("Access denied. You must be logged in to create an account.", 401);
-        }
-    
         // Fetch the authenticated user's role directly from the database
         $stmt = $this->pdo->prepare("SELECT role FROM author WHERE id = :id");
         $stmt->bindValue(':id', $authUser['id'], \PDO::PARAM_INT);
