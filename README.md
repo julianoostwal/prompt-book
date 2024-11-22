@@ -9,8 +9,6 @@ Welcome to the **Prompt Book** repository! This application is designed to help 
 - [Introduction](#introduction)
 - [Features](#features)
 - [Getting Started](#getting-started)
-- [Usage](#usage)
-- [License](#license)
 
 ---
 
