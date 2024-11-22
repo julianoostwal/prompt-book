@@ -72,7 +72,7 @@ export default function Home() {
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/prompt_fragments`);
-      setPrompts(response.data);
+      setPrompts(JSON.parse(response.data));
       setAllPrompts(response.data);
     } catch {
       setError("Er is een probleem met het ophalen van de prompts.");
@@ -101,8 +101,8 @@ export default function Home() {
       setNewPrompt({ content: "", description: "" });
       onClose();
     } else {
-      setPrompts([...prompts, {...newPrompt, tags: [], id: 0}]);
-      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0}]);
+      setPrompts([...prompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
+      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
       setNewPrompt({ content: "", description: "" });
       onClose();
     }
@@ -270,7 +270,7 @@ export default function Home() {
                     {prompt.description}
                   </h3>
                   <h4 className="font-bold text-primary">
-                    @{JSON.parse(prompt.author).name}
+                    @{prompt.author.name}
                   </h4>
                   {editingPromptId === prompt.id ? (
                     <Textarea
