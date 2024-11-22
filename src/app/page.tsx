@@ -16,8 +16,8 @@ import {
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import api from "@/app/api";
 import { useRouter } from "next/navigation";
+import api from "@/app/api";
 import askai from "./openai";
 
 export default function Home() {
@@ -42,7 +42,9 @@ export default function Home() {
   const [allTags, setAllTags] = useState<{ id: number; name: string }[]>([]);
   const [tags, setTags] = useState<{ id: number; name: string }[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const {
+    isOpen, onOpen, onOpenChange, onClose,
+  } = useDisclosure();
   const {
     isOpen: tagsIsOpen,
     onOpen: tagsOnOpen,
@@ -63,7 +65,6 @@ export default function Home() {
     id: 0,
     name: "",
   });
-  const [selectedTag, setSelectedTag] = useState<number | null>(null);
   const [editingPromptId, setEditingPromptId] = useState<number | null>(null);
   const [editingContent, setEditingContent] = useState("");
   const [user, setUser] = useState({
@@ -85,7 +86,11 @@ export default function Home() {
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/prompt_fragments`);
-      setPrompts(JSON.parse(response.data));
+      setPrompts(response.data.map((prompt: any) => ({
+        ...prompt,
+        tags: JSON.parse(prompt.tags),
+        author: JSON.parse(prompt.author),
+      })));
       setAllPrompts(response.data);
     } catch {
       setError("Er is een probleem met het ophalen van de prompts.");
@@ -104,7 +109,6 @@ export default function Home() {
   const handleAddPrompt = async () => {
     try {
       if (user && user.id !== 0) {
-<<<<<<< HEAD
         const response = await api.post(`${BASE_URL}/prompt_fragments`, {
           content: newPrompt.content,
           description: newPrompt.description,
@@ -113,31 +117,18 @@ export default function Home() {
         });
         setPrompts([...prompts, response.data]);
         setAllPrompts([...allPrompts, response.data]);
-        setNewPrompt({ content: "", description: "" });
+        setNewPrompt({ content: "", description: "", tags: [] });
         onClose();
       } else {
-        setPrompts([...prompts, { ...newPrompt, tags: [], id: 0 }]);
-        setAllPrompts([...allPrompts, { ...newPrompt, tags: [], id: 0 }]);
-        setNewPrompt({ content: "", description: "" });
+        setPrompts([...prompts, {
+          ...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" },
+        }]);
+        setAllPrompts([...allPrompts, {
+          ...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" },
+        }]);
+        setNewPrompt({ content: "", description: "", tags: [] });
         onClose();
       }
-=======
-      const response = await api.post(`${BASE_URL}/prompt_fragments`, {
-        content: newPrompt.content,
-        description: newPrompt.description,
-        author_id: user.id,
-      });
-      setPrompts([...prompts, response.data]);
-      setAllPrompts([...allPrompts, response.data]);
-      setNewPrompt({ content: "", description: "" });
-      onClose();
-    } else {
-      setPrompts([...prompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
-      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
-      setNewPrompt({ content: "", description: "" });
-      onClose();
-    }
->>>>>>> d2fc7edf750edbeee51202336c1f0bf7a9fa3664
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
@@ -176,9 +167,8 @@ export default function Home() {
   const handleEditPrompt = async (id: number) => {
     try {
       setPrompts(
-        prompts.map((prompt) =>
-          prompt.id === id ? { ...prompt, content: editingContent } : prompt
-        )
+        prompts.map((prompt) => (prompt.id === id ? { ...prompt, content: editingContent } : prompt),
+        ),
       );
       setEditingPromptId(null);
       setEditingContent("");
@@ -188,15 +178,12 @@ export default function Home() {
   };
 
   const filterPromptsByTag = (tagId: number) => {
-    setSelectedTag(tagId);
-    const filteredPrompts = allPrompts.filter((prompt) =>
-      prompt.tags.includes(tagId)
+    const filteredPrompts = allPrompts.filter((prompt) => prompt.tags.includes(tagId),
     );
     setPrompts(filteredPrompts);
   };
 
   const resetFilter = () => {
-    setSelectedTag(null);
     setPrompts(allPrompts);
   };
 
@@ -326,7 +313,7 @@ export default function Home() {
                   <a
                     target="_blank"
                     href={`https://chatgpt.com/?q=${encodeURIComponent(
-                      prompt.content
+                      prompt.content,
                     )}`}
                   >
                     Open with ChatGPT
@@ -355,11 +342,10 @@ export default function Home() {
                   <Input
                     label="Description"
                     value={newPrompt.description}
-                    onChange={(e) =>
-                      setNewPrompt({
-                        ...newPrompt,
-                        description: e.target.value,
-                      })
+                    onChange={(e) => setNewPrompt({
+                      ...newPrompt,
+                      description: e.target.value,
+                    })
                     }
                   />
                   <Button onClick={generateContent} disabled={isGenerating}>
@@ -370,17 +356,15 @@ export default function Home() {
                   <Textarea
                     label="Content"
                     value={newPrompt.content}
-                    onChange={(e) =>
-                      setNewPrompt({ ...newPrompt, content: e.target.value })
+                    onChange={(e) => setNewPrompt({ ...newPrompt, content: e.target.value })
                     }
                   />
                   <Select
                     selectionMode="multiple"
-                    onSelectionChange={(e) =>
-                      setNewPrompt({
-                        ...newPrompt,
-                        tags: Array.from(e).map((key) => Number(key)),
-                      })
+                    onSelectionChange={(e) => setNewPrompt({
+                      ...newPrompt,
+                      tags: Array.from(e).map((key) => Number(key)),
+                    })
                     }
                   >
                     {tags.map((tag) => (
@@ -413,11 +397,10 @@ export default function Home() {
                   <Input
                     label="Tag Name"
                     value={newTag.name}
-                    onChange={(e) =>
-                      setNewTag({
-                        ...newTag,
-                        name: e.target.value,
-                      })
+                    onChange={(e) => setNewTag({
+                      ...newTag,
+                      name: e.target.value,
+                    })
                     }
                   />
                 </ModalBody>
