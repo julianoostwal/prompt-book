@@ -25,3 +25,10 @@ docker run -d -p 3306:3306 --name deep_dive_database_container deep_dive_databas
 ```bash
 docker run --name phpmyadmin -d --link deep_dive_database_container:db -p 8082:80 phpmyadmin
 ```
+
+
+# website
+```bash
+docker build -t website .
+
+```

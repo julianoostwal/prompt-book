@@ -144,25 +144,26 @@ export default function Home() {
         setNewPrompt({ content: "", description: "", tags: [] });
         onClose();
       } else {
-        setPrompts([
-          ...prompts,
-          {
-            ...newPrompt,
-            tags: [],
-            id: 0,
-            author: { id: 0, name: "", email: "" },
-          },
-        ]);
-        setAllPrompts([
-          ...allPrompts,
-          {
-            ...newPrompt,
-            tags: [],
-            id: 0,
-            author: { id: 0, name: "", email: "" },
-          },
-        ]);
-        setNewPrompt({ content: "", description: "", tags: [] });
+        // setPrompts([
+        //   ...prompts,
+        //   {
+        //     ...newPrompt,
+        //     tags: [],
+        //     id: 0,
+        //     author: { id: 0, name: "", email: "" },
+        //   },
+        // ]);
+        // setAllPrompts([
+        //   ...allPrompts,
+        //   {
+        //     ...newPrompt,
+        //     tags: [],
+        //     id: 0,
+        //     author: { id: 0, name: "", email: "" },
+        //   },
+        // ]);
+        // setNewPrompt({ content: "", description: "", tags: [] });
+        setError("Je bent niet ingelogd.");
         onClose();
       }
     } catch {
@@ -346,6 +347,7 @@ export default function Home() {
                     </p>
                   )}
                 </div>
+                <div className="flex flex-col">
                 <Button size="sm" color="primary" className="mt-4">
                   <a
                     target="_blank"
@@ -363,7 +365,9 @@ export default function Home() {
                   onPress={() => handleDeletePrompt(prompt.id)}
                 >
                   Verwijderen
-                </Button>
+                </Button>             
+                </div>
+
               </motion.div>
             ))}
           </motion.div>
