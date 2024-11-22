@@ -30,5 +30,6 @@ docker run --name phpmyadmin -d --link deep_dive_database_container:db -p 8082:8
 # website
 ```bash
 docker build -t website .
+docker run -d -p 80:3000 website
 
 ```
