@@ -11,6 +11,7 @@ export default function Ai() {
   const [answer, setAnswer] = useState("");
 
   async function ai1() {
+    setAnswer("");
     const response = await askai(question);
     setAnswer(response || "");
     setQuestion("");
