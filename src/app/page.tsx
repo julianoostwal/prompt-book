@@ -85,7 +85,7 @@ export default function Home() {
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${BASE_URL}/prompt_fragments`);
-      setPrompts(response.data);
+      setPrompts(JSON.parse(response.data));
       setAllPrompts(response.data);
     } catch {
       setError("Er is een probleem met het ophalen van de prompts.");
@@ -104,6 +104,7 @@ export default function Home() {
   const handleAddPrompt = async () => {
     try {
       if (user && user.id !== 0) {
+<<<<<<< HEAD
         const response = await api.post(`${BASE_URL}/prompt_fragments`, {
           content: newPrompt.content,
           description: newPrompt.description,
@@ -120,6 +121,23 @@ export default function Home() {
         setNewPrompt({ content: "", description: "" });
         onClose();
       }
+=======
+      const response = await api.post(`${BASE_URL}/prompt_fragments`, {
+        content: newPrompt.content,
+        description: newPrompt.description,
+        author_id: user.id,
+      });
+      setPrompts([...prompts, response.data]);
+      setAllPrompts([...allPrompts, response.data]);
+      setNewPrompt({ content: "", description: "" });
+      onClose();
+    } else {
+      setPrompts([...prompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
+      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0, author: { id: 0, name: "", email: "" }}]);
+      setNewPrompt({ content: "", description: "" });
+      onClose();
+    }
+>>>>>>> d2fc7edf750edbeee51202336c1f0bf7a9fa3664
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
@@ -283,7 +301,7 @@ export default function Home() {
                     {prompt.description}
                   </h3>
                   <h4 className="font-bold text-primary">
-                    @{JSON.parse(prompt.author).name}
+                    @{prompt.author.name}
                   </h4>
                   {editingPromptId === prompt.id ? (
                     <Textarea
