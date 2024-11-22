@@ -28,19 +28,27 @@ class PromptFragmentResource extends Resource {
 
     public function post() {
         $data = $this->getJsonData();
-
+    
         if (empty($data['author_id']) || empty($data['content'])) {
             throw new \Exception("Author ID and content are required", 400);
         }
-
+    
+        // Insert the prompt fragment
         $id = $this->insertPromptFragment($data);
-
+    
+        // If tags are provided, link them to the new prompt fragment
+        if (!empty($data['tags']) && is_array($data['tags'])) {
+            foreach ($data['tags'] as $tagId) {
+                $this->insertPromptFragmentTag($id, $tagId);
+            }
+        }
+    
         return [
             'status' => 201,
             'data' => $this->getPromptFragment($id),
         ];
     }
-
+    
     public function put($id) {
         $data = $this->getJsonData();
 
