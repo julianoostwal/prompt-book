@@ -11,6 +11,8 @@ import {
   Input,
   Textarea,
   useDisclosure,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import { motion } from "framer-motion";
 import axios from "axios";
@@ -29,7 +31,13 @@ export default function Home() {
     }[]
   >([]);
   const [allPrompts, setAllPrompts] = useState<
-    { id: number, content: string, description: string, tags: number[]; author: { id: number; name: string; email: string }}[]
+    {
+      id: number;
+      content: string;
+      description: string;
+      tags: number[];
+      author: { id: number; name: string; email: string };
+    }[]
   >([]);
   const [allTags, setAllTags] = useState<{ id: number; name: string }[]>([]);
   const [tags, setTags] = useState<{ id: number; name: string }[]>([]);
@@ -41,10 +49,16 @@ export default function Home() {
     onOpenChange: tagsChange,
     onClose: tagsClose,
   } = useDisclosure();
-  const [newPrompt, setNewPrompt] = useState({
+  const [newPrompt, setNewPrompt] = useState<{
+    content: string;
+    description: string;
+    tags: number[];
+  }>({
     content: "",
     description: "",
+    tags: [],
   });
+
   const [newTag, setNewTag] = useState({
     id: 0,
     name: "",
@@ -58,7 +72,6 @@ export default function Home() {
     email: "",
   });
   const [isGenerating, setIsGenerating] = useState(false);
-
 
   const BASE_URL = "http://5.253.247.243:8000";
 
@@ -91,21 +104,22 @@ export default function Home() {
   const handleAddPrompt = async () => {
     try {
       if (user && user.id !== 0) {
-      const response = await api.post(`${BASE_URL}/prompt_fragments`, {
-        content: newPrompt.content,
-        description: newPrompt.description,
-        author_id: user.id,
-      });
-      setPrompts([...prompts, response.data]);
-      setAllPrompts([...allPrompts, response.data]);
-      setNewPrompt({ content: "", description: "" });
-      onClose();
-    } else {
-      setPrompts([...prompts, {...newPrompt, tags: [], id: 0}]);
-      setAllPrompts([...allPrompts, {...newPrompt, tags: [], id: 0}]);
-      setNewPrompt({ content: "", description: "" });
-      onClose();
-    }
+        const response = await api.post(`${BASE_URL}/prompt_fragments`, {
+          content: newPrompt.content,
+          description: newPrompt.description,
+          author_id: user.id,
+          tags: newPrompt.tags,
+        });
+        setPrompts([...prompts, response.data]);
+        setAllPrompts([...allPrompts, response.data]);
+        setNewPrompt({ content: "", description: "" });
+        onClose();
+      } else {
+        setPrompts([...prompts, { ...newPrompt, tags: [], id: 0 }]);
+        setAllPrompts([...allPrompts, { ...newPrompt, tags: [], id: 0 }]);
+        setNewPrompt({ content: "", description: "" });
+        onClose();
+      }
     } catch {
       setError("Er is een probleem met het toevoegen van de prompt.");
     }
@@ -167,7 +181,6 @@ export default function Home() {
     setSelectedTag(null);
     setPrompts(allPrompts);
   };
-
 
   const generateContent = async () => {
     setIsGenerating(true);
@@ -332,7 +345,9 @@ export default function Home() {
                     }
                   />
                   <Button onClick={generateContent} disabled={isGenerating}>
-                    {isGenerating ? "Generating..." : "Generate prompt content with AI"}
+                    {isGenerating
+                      ? "Generating..."
+                      : "Generate prompt content with AI"}
                   </Button>
                   <Textarea
                     label="Content"
@@ -341,6 +356,21 @@ export default function Home() {
                       setNewPrompt({ ...newPrompt, content: e.target.value })
                     }
                   />
+                  <Select
+                    selectionMode="multiple"
+                    onSelectionChange={(e) =>
+                      setNewPrompt({
+                        ...newPrompt,
+                        tags: Array.from(e).map((key) => Number(key)),
+                      })
+                    }
+                  >
+                    {tags.map((tag) => (
+                      <SelectItem key={tag.id} value={tag.id}>
+                        {tag.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="light" onPress={onClose}>
