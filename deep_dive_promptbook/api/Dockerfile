@@ -12,7 +12,8 @@ COPY . /var/www/html
 
 # Set environment variables for the development server
 # Replace "db" with your database container name
-ENV DB_HOST=deep_dive_database_container
+ENV DB_HOST=joo0kc8o40kgsscws8w8c0s0.5.253.247.243.sslip.io
+ENV DB_PORT=3306
 ENV DB_NAME=promptbook
 ENV DB_USER=bit_academy
 ENV DB_PASS=bit_academy
