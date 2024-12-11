@@ -11,7 +11,8 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Set environment variables for the development server
-ENV DB_HOST=db
+# Replace "db" with your database container name
+ENV DB_HOST=deep_dive_database_container
 ENV DB_NAME=promptbook
 ENV DB_USER=bit_academy
 ENV DB_PASS=bit_academy
