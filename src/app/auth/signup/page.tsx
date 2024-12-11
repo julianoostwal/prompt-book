@@ -15,7 +15,7 @@ export default function Signup() {
 
   const handleSignup = async () => {
     try {
-      await axios.post("http://5.253.247.243:8000/authors", {
+      await axios.post("http://ds0wow0o0o4cco048sko8sk8.5.253.247.243.sslip.io/authors", {
         name,
         email,
         password,

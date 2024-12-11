@@ -18,7 +18,7 @@ import {
 import { motion } from "framer-motion";
 import api from "../api";
 
-const API_BASE_URL = "http://5.253.247.243:8000";
+const API_BASE_URL = "http://ds0wow0o0o4cco048sko8sk8.5.253.247.243.sslip.io";
 
 export default function Admin() {
   const [users, setUsers] = useState<

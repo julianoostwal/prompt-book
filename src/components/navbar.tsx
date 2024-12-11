@@ -4,7 +4,7 @@ import axios from "axios";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, Button } from "@nextui-org/react";
 import { useAuth } from "./AuthContext";
 
-const API_BASE_URL = "http://5.253.247.243:8000";
+const API_BASE_URL = "http://ds0wow0o0o4cco048sko8sk8.5.253.247.243.sslip.io";
 
 export default function App() {
   const { token, logout } = useAuth();

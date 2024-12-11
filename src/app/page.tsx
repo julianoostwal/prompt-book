@@ -73,7 +73,7 @@ export default function Home() {
   });
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const BASE_URL = "http://5.253.247.243:8000";
+  const BASE_URL = "http://ds0wow0o0o4cco048sko8sk8.5.253.247.243.sslip.io";
 
   const router = useRouter();
 
