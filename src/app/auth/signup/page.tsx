@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Input, Button } from "@nextui-org/react";
+import { Input, Button } from "@heroui/react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";

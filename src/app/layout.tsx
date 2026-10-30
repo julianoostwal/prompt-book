@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { NextUIProvider } from "@nextui-org/react";
+import { Providers } from "../components/providers";
 import Navbar from "../components/navbar";
 import { AuthProvider } from "../components/AuthContext";
 
@@ -31,12 +31,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextUIProvider>
+        <Providers>
           <AuthProvider>
             <Navbar />
             {children}
           </AuthProvider>
-        </NextUIProvider>
+        </Providers>
       </body>
     </html>
   );

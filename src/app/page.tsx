@@ -14,7 +14,7 @@ import {
   useDisclosure,
   Select,
   SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -412,7 +412,7 @@ export default function Home() {
                     }
                   >
                     {tags.map((tag) => (
-                      <SelectItem key={tag.id} value={tag.id}>
+                      <SelectItem key={tag.id}>
                         {tag.name}
                       </SelectItem>
                     ))}
