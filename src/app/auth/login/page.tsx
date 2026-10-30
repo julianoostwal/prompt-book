@@ -1,6 +1,6 @@
 "use client";
 import { FormEvent, useState } from "react";
-import { Input } from "@nextui-org/react";
+import { Input } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
 import { motion } from "framer-motion";

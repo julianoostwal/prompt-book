@@ -14,7 +14,7 @@ import {
   useDisclosure,
   Select,
   SelectItem,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { motion } from "framer-motion";
 import api from "../api";
 
@@ -219,7 +219,7 @@ export default function Admin() {
                     }
                   >
                     {["user", "admin"].map((role) => (
-                      <SelectItem key={role} value={role}>
+                      <SelectItem key={role}>
                         {role}
                       </SelectItem>
                     ))}
@@ -331,7 +331,7 @@ export default function Admin() {
                     }
                   >
                     {["user", "admin"].map((role) => (
-                      <SelectItem key={role} value={role}>
+                      <SelectItem key={role}>
                         {role}
                       </SelectItem>
                     ))}
